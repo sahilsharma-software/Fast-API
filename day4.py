@@ -1,4 +1,4 @@
-from fastapi import FastAPI,HTTPException
+from fastapi import FastAPI,HTTPException , Query
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -11,19 +11,33 @@ class Product(BaseModel):
     price:int
     category:str
 
-
 @app.get("/")
 def get():
     return {"message":"Product api is running"}
 
+
 @app.post("/products")
 def create_products(product:Product):
     products.append(product)
-    return product
+    return products
+
 
 @app.get("/products")
-def get_products():
-    return products
+def get_products(
+    category:str | None= None,
+    min_price:int | None = None,
+    search:str | None = None,
+    skip:int = Query(default=0,ge=1,le=10,description="maximum number of products to skip"),
+    limit:int = Query(default=2,ge=1,le=100,description="maximum number of products to skip")
+):
+    filtered_product = []
+    for product in products:
+        if((category is None or product.category ==category)\
+           and (min_price is None or product.price >= min_price)\
+           and (search is None or search.lower() in product.name.lower())):
+            filtered_product.append(product)
+    return filtered_product[skip:skip+limit]
+   
 
 @app.get("/products/{product_id}")
 def get_product(product_id:int):
@@ -60,7 +74,3 @@ def delete_product(product_id:int):
         status_code=404,
         detail="Product not found"
     )
-
-@app.get("/users")
-def get_items(category:str | None = None):
-    return {"category":category}
