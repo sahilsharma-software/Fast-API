@@ -22,6 +22,7 @@ def create_products(product:Product):
     return products
 
 
+
 @app.get("/products")
 def get_products(
     category:str | None= None,
