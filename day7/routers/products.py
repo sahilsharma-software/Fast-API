@@ -44,7 +44,7 @@ def create_product(product:Product):
 def update_product(product_id:int , updated_product:Product):
     for index ,product in enumerate(products):
         if product_id == product["id"]:
-            products[index] = update_product
+            products[index] = updated_product
             return update_product
     return {"message":"product not found"}
 
